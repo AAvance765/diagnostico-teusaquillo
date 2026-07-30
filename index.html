@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Diagnóstico Emprendedor Teusaquillo</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background-color: #f8fafc; 
+            margin: 0;
+            padding: 0;
+        }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        .slide-in { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .bounce { animation: bounce 1s infinite; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .app-container { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; }
+        .card { width: 100%; max-width: 480px; background: white; border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; min-height: 85vh; max-height: 95vh;}
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const Icons = {
+            User: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+            BookOpen: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+            Smartphone: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
+            Wallet: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>,
+            Home: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+            Lifebuoy: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="14.83" y1="9.17" x2="18.36" y2="5.64"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>,
+            TrendingUp: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>,
+            Receipt: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>,
+            Calendar: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+            Heart: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
+            GraduationCap: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>,
+            Users: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+            Briefcase: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
+            HeartPulse: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>,
+            Clock: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+            PiggyBank: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h.01"/></svg>,
+            Target: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+            Rocket: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15 3.3 3.3a1 1 0 0 0 1.6-.1 3 3 0 0 0 .8-2.6L16.2 11"/><path d="m9 12-3.3-3.3a1 1 0 0 1 .1-1.6 3 3 0 0 1 2.6-.8L12 7.8"/><path d="m14 8 2-2c1.08-1.08 2.7-1.93 4-2s-1 2.92-2 4l-2 2"/></svg>,
+            FileBadge: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7V4a2 2 0 0 1 2-2h10l5 5v13a2 2 0 0 1-2 2H4"/><path d="M9 17v4l3-3 3 3v-4"/><circle cx="12" cy="13" r="3"/></svg>,
+            Mountain: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>,
+            ArrowLeft: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>,
+            ChevronRight: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>,
+            Loader: () => <svg className="animate-spin text-blue-600" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>,
+            Lock: () => <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        };
+
+        const QUESTIONS = [
+            // Módulo 1: Datos Personales
+            { id: "q_nombre", text: "¡Hola! Qué emoción tenerte aquí. Para empezar, ¿cuál es tu nombre completo?", type: "text", icon: "User" },
+            { id: "q_edad", text: "¿Cuántos años tienes?", type: "number", icon: "Calendar" },
+            { id: "q_civil", text: "Cuéntanos un poco más sobre ti, ¿cuál es tu estado civil?", type: "select", icon: "Heart", options: [{label:"Soltero/a"}, {label:"Casado/a"}, {label:"Unión Libre"}, {label:"Otro"}] },
+            { id: "q_educacion", text: "¿Hasta qué nivel estudiaste?", type: "select", icon: "GraduationCap", options: [{label:"Primaria"}, {label:"Bachillerato"}, {label:"Técnico/Tecnólogo"}, {label:"Universitario"}] },
+            
+            // Módulo 2: Estado Financiero
+            { id: "q_trabajo_extra", text: "Aparte de tu emprendimiento, ¿tienes algún otro trabajo actualmente?", type: "select", icon: "Briefcase", options: [{label:"Sí, soy empleado también"}, {label:"No, solo mi emprendimiento"}] },
+            { id: "q_salud_pension", text: "¿Estás cotizando a salud y pensión en este momento?", type: "select", icon: "HeartPulse", options: [{label:"Sí"}, {label:"No"}] },
+            { id: "q_dinero_libre", text: "En un mes normal, ¿cuánto dinero le queda 'libre' a tu negocio?", type: "number", icon: "Wallet", placeholder: "$" },
+            { id: "q_gastos_negocio", text: "¿A cuánto ascienden los gastos fijos mensuales de tu negocio (arriendo, servicios, etc.)?", type: "number", icon: "Receipt", placeholder: "$" },
+            { id: "q_gastos_personales", text: "Y en lo personal, ¿cuánto suman tus gastos fijos familiares al mes?", type: "number", icon: "Home", placeholder: "$" },
+            { id: "q_cuotas_deudas", text: "¿Pagas cuotas mensuales de otras deudas? Si es así, ¿cuánto suman?", type: "number", icon: "Wallet", placeholder: "$" },
+            { id: "q_soportes", text: "¿Cuentas con documentos para demostrar tus ingresos (facturas, cuadernos, extractos)?", type: "select", icon: "BookOpen", options: [{label:"Sí"}, {label:"No"}] },
+
+            // Módulo 3: El Negocio y Ahorro
+            { id: "q_tiempo_negocio", text: "¿Hace cuántos meses le diste vida a tu negocio?", type: "number", icon: "Clock" },
+            { id: "q_capital_inicial", text: "¿Recuerdas con cuánto dinero empezaste tu negocio?", type: "number", icon: "Wallet", placeholder: "$" },
+            { id: "q_ahorro_actual", text: "Para este programa el ahorro es clave. ¿Actualmente logras guardar algo de dinero al mes?", type: "select", icon: "PiggyBank", options: [{label:"Sí, sagradamente"}, {label:"A veces"}, {label:"No, por ahora me cuesta"}] },
+            { id: "q_compromiso_ahorro", text: "¿Cuánto dinero te comprometerías a ahorrar mensualmente durante los próximos 3 meses?", type: "number", icon: "Target", placeholder: "$" },
+            
+            // PREGUNTAS DIAGNÓSTICAS (Tienen 'weight' para calcular el Nivel)
+            { id: "q_pagos", text: "¿Cómo sueles recibir el dinero de tus clientes hoy en día?", type: "select", icon: "Smartphone", options: [
+                {label:"Casi todo en efectivo", weight: 1}, 
+                {label:"Mitad efectivo y mitad transferencias (Nequi/Daviplata)", weight: 2}, 
+                {label:"Uso links de pago, datáfono y transferencias", weight: 3}
+            ]},
+            { id: "q_valor_inventario", text: "Si vendieras tus herramientas o mercancía hoy, ¿cuánto valdrían en total?", type: "number", icon: "Wallet", placeholder: "$" },
+            { id: "q_reinversion", text: "Del dinero libre que te queda, ¿qué porcentaje le vuelves a meter al negocio?", type: "number", icon: "TrendingUp", placeholder: "%" },
+            
+            // Módulo 4: El Capital
+            { id: "q_registro", text: "¿Tienes tu negocio registrado formalmente (Cámara de Comercio, RUT)?", type: "select", icon: "FileBadge", options: [{label:"Sí"}, {label:"En proceso"}, {label:"No"}] },
+            { id: "q_capital_necesario", text: "¡Vamos al grano! ¿Cuánto capital necesitas para impulsar tu emprendimiento?", type: "number", icon: "Rocket", placeholder: "$" },
+            { id: "q_destino_dinero", text: "¿En qué vas a invertir principalmente este dinero si logras tu meta de ahorro?", type: "select", icon: "Target", options: [{label:"Mercancía/Inventario"}, {label:"Maquinaria/Equipos"}, {label:"Mejorar mi local"}, {label:"Otro"}] },
+            { id: "q_frecuencia_ventas", text: "¿Tus ventas fuertes son diarias, semanales o mensuales?", type: "select", icon: "TrendingUp", options: [{label:"Diarias"}, {label:"Semanales"}, {label:"Mensuales"}] },
+            
+            // MÁS PREGUNTAS DIAGNÓSTICAS
+            { id: "q_lleva_cuentas", text: "¿Cómo llevas las cuentas de tu negocio actualmente?", type: "select", icon: "BookOpen", options: [
+                {label:"Todo en la cabeza, tengo buena memoria", weight: 1}, 
+                {label:"Cuaderno de notas", weight: 2}, 
+                {label:"Excel o Aplicación móvil", weight: 3}
+            ]},
+            { id: "q_obstaculo", text: "Por último, ¿cuál sientes que es el mayor obstáculo de tu negocio hoy en día?", type: "text", icon: "Mountain" },
+            { id: "q_separacion", text: "Imagina que hoy vendiste mucho y tienes que hacer mercado para tu casa. ¿Cómo manejas ese dinero?", type: "select", icon: "Wallet", options: [
+                {label:"Saco la plata del mismo bolsillo o cajón", weight: 1}, 
+                {label:"Intento separar, pero a veces me toca pedirle prestado al negocio", weight: 2}, 
+                {label:"Tengo cuentas totalmente separadas, me pago un sueldo", weight: 3}
+            ]},
+            { id: "q_emergencia", text: "Si tuvieras una emergencia personal y no pudieras abrir por una semana, ¿qué pasaría?", type: "select", icon: "Lifebuoy", options: [
+                {label:"Me tocaría pedir prestado inmediatamente", weight: 1}, 
+                {label:"Me alcanzaría para sobrevivir unos días con lo que hay en caja", weight: 2}, 
+                {label:"Tranquilo, tengo un fondo de emergencias ahorrado", weight: 3}
+            ]},
+            { id: "q_margenes", text: "Si hacer un producto te cuesta $50 y lo vendes en $100, ¿qué sueles hacer con los $50 de diferencia?", type: "select", icon: "TrendingUp", options: [
+                {label:"Es mi plata, la uso para mis gastos diarios", weight: 1}, 
+                {label:"Compro más material para volver a vender", weight: 2}, 
+                {label:"Una parte es ganancia, otra se reinvierte y otra para gastos", weight: 3}
+            ]},
+            { id: "q_costos_fijos", text: "¿Tienes claro cuáles son los 'gastos fijos' de tu emprendimiento (esos que pagas vendas o no)?", type: "select", icon: "Receipt", options: [
+                {label:"No estoy seguro de qué es un gasto fijo", weight: 1}, 
+                {label:"Tengo una idea, pero no los sumo todos los meses", weight: 2}, 
+                {label:"Sí, los tengo calculados y es lo primero que separo", weight: 3}
+            ]}
+        ];
+
+        // LA LISTA DE CÉDULAS PERMITIDAS DE TEUSAQUILLO (Reemplaza estos números por las cédulas reales)
+        const CEDULAS_TEUSAQUILLO = ["123456", "987654", "112233", "000000"]; 
+        
+        // LA URL DE TU GOOGLE SHEETS VIA SHEETDB
+        const SHEETDB_URL = 'https://sheetdb.io/api/v1/8a4sbxjkocsmg'; 
+
+        function App() {
+            const [appState, setAppState] = useState('login'); // 'login', 'welcome', 'quiz', 'loading', 'result'
+            const [cedulaInput, setCedulaInput] = useState('');
+            const [loginError, setLoginError] = useState('');
+            
+            const [currentStep, setCurrentStep] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [currentText, setCurrentText] = useState('');
+            const [score, setScore] = useState(0); // Puntaje para las preguntas diagnóstico
+            const [assignedLevel, setAssignedLevel] = useState('');
+
+            const currentQuestion = QUESTIONS[currentStep];
+            const progress = (currentStep / QUESTIONS.length) * 100;
+
+            const handleLogin = () => {
+                if(cedulaInput.trim() === '') {
+                    setLoginError("Por favor ingresa un número de documento.");
+                    return;
+                }
+                
+                if (CEDULAS_TEUSAQUILLO.includes(cedulaInput.trim())) {
+                    setLoginError('');
+                    setAnswers({ "Cedula": cedulaInput.trim() });
+                    setAppState('welcome');
+                } else {
+                    setLoginError("Tu documento no está registrado en el programa Teusaquillo.");
+                }
+            };
+
+            const handleNext = () => {
+                if (currentText.trim() !== '') {
+                    setAnswers({ ...answers, [currentQuestion.id]: currentText });
+                }
+                advanceOrFinish();
+            };
+
+            const handleChoice = (optionObj) => {
+                const newAnswers = { ...answers, [currentQuestion.id]: optionObj.label };
+                // Solo suma puntaje si la opción tiene un 'weight' definido (es una pregunta diagnóstica)
+                const newScore = optionObj.weight ? score + optionObj.weight : score;
+                
+                setAnswers(newAnswers);
+                setScore(newScore);
+                
+                setTimeout(() => {
+                    advanceOrFinish(newAnswers, newScore);
+                }, 350);
+            };
+
+            const advanceOrFinish = (finalAnswers = answers, finalScore = score) => {
+                if (currentStep < QUESTIONS.length - 1) {
+                    setCurrentStep(currentStep + 1);
+                    setCurrentText(finalAnswers[QUESTIONS[currentStep + 1].id] || '');
+                } else {
+                    calculateAndSubmit(finalAnswers, finalScore);
+                }
+            };
+
+            const handleBack = () => {
+                if (currentStep > 0) {
+                    setCurrentStep(currentStep - 1);
+                    setCurrentText(answers[QUESTIONS[currentStep - 1].id] || '');
+                }
+            };
+
+            const calculateAndSubmit = async (finalAnswers, finalScore) => {
+                setAppState('loading');
+                
+                // Determinar el nivel según el puntaje (7 preguntas diagnósticas = Max 21 puntos)
+                let level = "Nivel 1: Iniciación Digital";
+                if (finalScore >= 12 && finalScore <= 16) level = "Nivel 2: Finanzas Personales";
+                if (finalScore >= 17) level = "Nivel 3: Fundamentos de Emprendimiento";
+                
+                setAssignedLevel(level);
+
+                const dataToSend = {
+                    ...finalAnswers,
+                    "Puntaje_Total": finalScore,
+                    "Nivel_Asignado": level,
+                    "Fecha": new Date().toLocaleString()
+                };
+
+                try {
+                    const response = await fetch(SHEETDB_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ data: dataToSend })
+                    });
+
+                    if (!response.ok) throw new Error('Network response error');
+                    
+                    setTimeout(() => {
+                        setAppState('result');
+                    }, 1500);
+
+                } catch (error) {
+                    console.error('Error enviando a SheetDB:', error);
+                    // Incluso si falla la red, mostramos el resultado para no bloquear al usuario
+                    setTimeout(() => {
+                        setAppState('result');
+                    }, 1000);
+                }
+            };
+
+            // PANTALLA 1: LOGIN POR CÉDULA
+            if (appState === 'login') {
+                return (
+                    <div className="app-container">
+                        <div className="card p-8 text-center slide-in flex flex-col justify-center items-center">
+                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-600">
+                                <Icons.Lock />
+                            </div>
+                            <h1 className="text-2xl font-extrabold text-slate-800 mb-2">Acceso Exclusivo</h1>
+                            <p className="text-slate-600 mb-8 leading-relaxed">
+                                Ingresa tu número de documento para acceder al perfilamiento de Teusaquillo.
+                            </p>
+                            
+                            <input
+                                type="number"
+                                value={cedulaInput}
+                                onChange={(e) => setCedulaInput(e.target.value)}
+                                placeholder="Tu número de documento"
+                                className="w-full p-4 rounded-xl border-2 border-slate-200 bg-slate-50 focus:border-blue-600 outline-none text-center text-xl font-medium mb-4"
+                                onKeyPress={(e) => { if(e.key === 'Enter') handleLogin(); }}
+                            />
+                            
+                            {loginError && <p className="text-red-500 text-sm font-medium mb-4">{loginError}</p>}
+                            
+                            <button 
+                                onClick={handleLogin}
+                                className="w-full py-4 px-6 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-200"
+                            >
+                                Verificar Ingreso
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            // PANTALLA 2: BIENVENIDA AL RETO DE AHORRO Y PERFIL
+            if (appState === 'welcome') {
+                return (
+                    <div className="app-container">
+                        <div className="card p-8 text-center slide-in flex flex-col justify-center items-center">
+                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-600 bounce">
+                                <Icons.Rocket />
+                            </div>
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-4 leading-tight">Programa de Capital para Emprendedores</h1>
+                            <p className="text-slate-600 mb-6 text-lg leading-relaxed">
+                                Este programa te otorga capital que <strong>no tienes que devolver</strong>. El único requisito es demostrar que puedes ahorrar durante 3 meses consecutivos.
+                            </p>
+                            <p className="text-slate-600 mb-8 text-md leading-relaxed bg-slate-50 p-4 rounded-xl">
+                                A continuación, completaremos tu perfil emprendedor para personalizar tu ruta de aprendizaje. ¡Sé lo más honesto posible!
+                            </p>
+                            <button 
+                                onClick={() => setAppState('quiz')}
+                                className="w-full py-4 px-6 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 active:scale-95 transition-all shadow-xl shadow-blue-200"
+                            >
+                                ¡Acepto el reto!
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            // PANTALLA DE CARGA
+            if (appState === 'loading') {
+                return (
+                    <div className="app-container fade-in">
+                        <div className="text-center flex flex-col items-center">
+                            <Icons.Loader />
+                            <h2 className="text-2xl font-bold text-slate-800 mt-6 mb-2">Analizando tu perfil...</h2>
+                            <p className="text-slate-500 text-lg">Diseñando tu ruta de aprendizaje ideal.</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            // PANTALLA DE RESULTADOS
+            if (appState === 'result') {
+                return (
+                    <div className="app-container fade-in">
+                        <div className="card p-8 text-center border-t-8 border-blue-500 flex flex-col justify-center items-center">
+                            <div className="flex justify-center mb-6 text-green-500">
+                                <Icons.Target />
+                            </div>
+                            <h2 className="text-3xl font-extrabold text-slate-800 mb-2">¡Todo listo!</h2>
+                            <p className="text-slate-600 mb-8 text-lg leading-relaxed">
+                                Hemos guardado tu perfil exitosamente. Muy pronto el equipo de Teusaquillo se contactará contigo para iniciar tu ruta de aprendizaje enfocada en el ahorro.
+                            </p>
+                            <button 
+                                onClick={() => window.location.reload()}
+                                className="w-full py-4 px-6 bg-slate-800 text-white rounded-2xl font-bold text-lg hover:bg-slate-900 active:scale-95 transition-all"
+                            >
+                                Finalizar
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            // PANTALLA DEL QUIZ (Preguntas Dinámicas)
+            const IconComponent = Icons[currentQuestion.icon] || Icons.User;
+
+            return (
+                <div className="app-container">
+                    <div className="card flex-1 relative slide-in" key={currentStep}>
+                        
+                        {/* Header y Progreso */}
+                        <div className="px-6 pt-6 pb-2">
+                            <div className="flex items-center justify-between mb-4">
+                                <button onClick={handleBack} className={`text-slate-400 p-2 hover:bg-slate-100 rounded-full transition-colors ${currentStep === 0 ? 'invisible' : ''}`}>
+                                    <Icons.ArrowLeft />
+                                </button>
+                                <span className="text-xs font-bold text-slate-400 tracking-widest uppercase">
+                                    Pregunta {currentStep + 1} de {QUESTIONS.length}
+                                </span>
+                                <div className="w-10"></div>
+                            </div>
+                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
+                            </div>
+                        </div>
+
+                        {/* Contenido Pregunta */}
+                        <div className="flex-1 px-6 pb-8 flex flex-col overflow-y-auto">
+                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600 flex-shrink-0">
+                                <IconComponent />
+                            </div>
+
+                            <h2 className="text-2xl font-extrabold text-slate-800 mb-8 leading-snug">
+                                {currentQuestion.text}
+                            </h2>
+
+                            {/* Opciones Select */}
+                            {currentQuestion.type === 'select' && (
+                                <div className="flex flex-col gap-3 mt-auto mb-2">
+                                    {currentQuestion.options.map((optionObj, idx) => {
+                                        const isSelected = answers[currentQuestion.id] === optionObj.label;
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleChoice(optionObj)}
+                                                className={`flex items-center p-5 rounded-2xl border-2 text-left transition-all duration-200 active:scale-[0.98]
+                                                ${isSelected ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-slate-100 hover:border-blue-200 bg-white shadow-sm'}`}
+                                            >
+                                                <div className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center transition-colors flex-shrink-0
+                                                    ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-slate-300'}`}>
+                                                    {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
+                                                </div>
+                                                <span className={`font-semibold text-[17px] leading-tight ${isSelected ? 'text-blue-900' : 'text-slate-700'}`}>
+                                                    {optionObj.label}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {/* Inputs de Texto o Número */}
+                            {(currentQuestion.type === 'text' || currentQuestion.type === 'number') && (
+                                <div className="flex flex-col mt-auto pt-4">
+                                    <input
+                                        type={currentQuestion.type}
+                                        value={currentText}
+                                        onChange={(e) => setCurrentText(e.target.value)}
+                                        placeholder={currentQuestion.placeholder || "Escribe tu respuesta aquí..."}
+                                        className="w-full p-5 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:border-blue-500 focus:bg-white transition-all text-xl text-slate-800 font-medium outline-none mb-6 shadow-sm"
+                                        onKeyPress={(e) => { if(e.key === 'Enter') handleNext(); }}
+                                    />
+                                    <button
+                                        onClick={handleNext}
+                                        disabled={!currentText.trim()}
+                                        className="w-full py-4 px-6 bg-blue-600 text-white rounded-2xl font-bold text-lg disabled:opacity-40 disabled:scale-100 hover:bg-blue-700 active:scale-95 transition-all shadow-xl shadow-blue-200 flex justify-center items-center"
+                                    >
+                                        Continuar
+                                        <div className="ml-2"><Icons.ChevronRight /></div>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
