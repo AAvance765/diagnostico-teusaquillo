@@ -159,9 +159,6 @@
             ]}
         ];
 
-        // CÉDULAS PERMITIDAS DE TEUSAQUILLO
-        const CEDULAS_TEUSAQUILLO = ["123456", "987654", "112233", "000000"]; 
-        
         // URL DE SHEETDB
         const SHEETDB_URL = 'https://sheetdb.io/api/v1/8a4sbxjkocsmg'; 
 
@@ -171,6 +168,9 @@
             const [aceptarDatos, setAceptarDatos] = useState(false);
             const [loginError, setLoginError] = useState('');
             
+            // NUEVO: Estado para guardar la lista de cédulas cargada desde el archivo
+            const [cedulasPermitidas, setCedulasPermitidas] = useState([]);
+            
             const [currentStep, setCurrentStep] = useState(0);
             const [answers, setAnswers] = useState({});
             const [currentText, setCurrentText] = useState('');
@@ -179,6 +179,20 @@
 
             const currentQuestion = QUESTIONS[currentStep];
             const progress = (currentStep / QUESTIONS.length) * 100;
+
+            // NUEVO: Cargar el archivo cedulas.json apenas abre la página
+            useEffect(() => {
+                fetch('./cedulas.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Convertimos todo a texto para evitar errores si escriben números sin comillas
+                        const cedulasTexto = data.map(String);
+                        setCedulasPermitidas(cedulasTexto);
+                    })
+                    .catch(err => {
+                        console.error("Error cargando el archivo de cédulas:", err);
+                    });
+            }, []);
 
             const handleLogin = () => {
                 setLoginError('');
@@ -193,7 +207,8 @@
                     return;
                 }
                 
-                if (CEDULAS_TEUSAQUILLO.includes(cedulaInput.trim())) {
+                // NUEVO: Verificamos contra la lista cargada desde el archivo
+                if (cedulasPermitidas.includes(cedulaInput.trim())) {
                     setLoginError('');
                     setAnswers({ "Cedula": cedulaInput.trim() });
                     setAppState('welcome');
