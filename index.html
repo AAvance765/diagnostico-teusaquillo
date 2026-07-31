@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Diagnóstico AAvance Teusaquillo</title>
+    <title>Diagnóstico Emprendedor Teusaquillo</title>
     
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -12,7 +12,7 @@
 
     <style>
         :root {
-            --aavance-blue: #002244; /* Azul oscuro corporativo AAvance */
+            --aavance-blue: #002244; 
             --aavance-light-blue: #0056b3; 
             --aavance-accent: #00b4d8;
         }
@@ -33,6 +33,12 @@
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .app-container { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; }
         .card { width: 100%; max-width: 480px; background: white; border-radius: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; min-height: 85vh; max-height: 95vh;}
+        
+        /* Checkbox styling */
+        .checkbox-wrapper { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1.5rem; text-align: left; }
+        .checkbox-wrapper input[type="checkbox"] { width: 1.2rem; height: 1.2rem; margin-top: 0.2rem; accent-color: var(--aavance-blue); cursor: pointer; flex-shrink: 0; }
+        .checkbox-wrapper label { font-size: 0.85rem; color: #475569; line-height: 1.4; cursor: pointer; }
+        .checkbox-wrapper a { color: var(--aavance-light-blue); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -149,15 +155,16 @@
             ]}
         ];
 
-        // CÉDULAS DE PRUEBA (Cambia esto por tus cédulas reales luego)
+        // CÉDULAS PERMITIDAS DE TEUSAQUILLO (Reemplazar)
         const CEDULAS_TEUSAQUILLO = ["123456", "987654", "112233", "000000"]; 
         
-        // TU URL DE SHEETDB
+        // URL DE SHEETDB
         const SHEETDB_URL = 'https://sheetdb.io/api/v1/8a4sbxjkocsmg'; 
 
         function App() {
-            const [appState, setAppState] = useState('login'); // 'login', 'welcome', 'quiz', 'loading', 'result'
+            const [appState, setAppState] = useState('login'); 
             const [cedulaInput, setCedulaInput] = useState('');
+            const [aceptarDatos, setAceptarDatos] = useState(false);
             const [loginError, setLoginError] = useState('');
             
             const [currentStep, setCurrentStep] = useState(0);
@@ -170,8 +177,15 @@
             const progress = (currentStep / QUESTIONS.length) * 100;
 
             const handleLogin = () => {
+                setLoginError('');
+                
                 if(cedulaInput.trim() === '') {
                     setLoginError("Por favor ingresa un número de documento.");
+                    return;
+                }
+                
+                if (!aceptarDatos) {
+                    setLoginError("Debes aceptar la política de tratamiento de datos para continuar.");
                     return;
                 }
                 
@@ -264,13 +278,12 @@
                 return (
                     <div className="app-container">
                         <div className="card p-8 text-center slide-in flex flex-col justify-center items-center">
-                            {/* LOGO AAVANCE AQUÍ */}
                             <BrandLogo />
-                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6" style={{color: 'var(--aavance-blue)'}}>
+                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6" style={{color: 'var(--aavance-blue)'}}>
                                 <Icons.Lock />
                             </div>
                             <h1 className="text-2xl font-extrabold text-slate-800 mb-2">Acceso Exclusivo</h1>
-                            <p className="text-slate-600 mb-8 leading-relaxed">
+                            <p className="text-slate-600 mb-6 leading-relaxed">
                                 Ingresa tu número de documento para acceder al perfilamiento de Teusaquillo.
                             </p>
                             
@@ -279,10 +292,23 @@
                                 value={cedulaInput}
                                 onChange={(e) => setCedulaInput(e.target.value)}
                                 placeholder="Tu número de documento"
-                                className="w-full p-4 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white outline-none text-center text-xl font-medium mb-4 transition-all"
+                                className="w-full p-4 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white outline-none text-center text-xl font-medium mb-6 transition-all"
                                 style={{outlineColor: 'var(--aavance-blue)'}}
                                 onKeyPress={(e) => { if(e.key === 'Enter') handleLogin(); }}
                             />
+                            
+                            {/* Checkbox de Tratamiento de Datos */}
+                            <div className="checkbox-wrapper">
+                                <input 
+                                    type="checkbox" 
+                                    id="datosCheck" 
+                                    checked={aceptarDatos}
+                                    onChange={(e) => setAceptarDatos(e.target.checked)}
+                                />
+                                <label htmlFor="datosCheck">
+                                    He leído y autorizo la <a href="https://aavance.com/politica-de-tratamiento-de-datos-personales-aavance/" target="_blank" rel="noopener noreferrer">política de tratamiento de datos personales</a> de AAvance SAS para el procesamiento de mi información.
+                                </label>
+                            </div>
                             
                             {loginError && <p className="text-red-500 text-sm font-medium mb-4">{loginError}</p>}
                             
@@ -303,7 +329,6 @@
                 return (
                     <div className="app-container">
                         <div className="card p-8 text-center slide-in flex flex-col justify-center items-center">
-                            {/* LOGO AAVANCE AQUÍ */}
                             <BrandLogo />
                             <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 bounce" style={{color: 'var(--aavance-blue)'}}>
                                 <Icons.Rocket />
@@ -332,7 +357,6 @@
                 return (
                     <div className="app-container fade-in">
                         <div className="text-center flex flex-col items-center">
-                            {/* LOGO AAVANCE AQUÍ */}
                             <BrandLogo />
                             <Icons.Loader />
                             <h2 className="text-2xl font-bold text-slate-800 mt-6 mb-2">Analizando tu perfil...</h2>
@@ -347,7 +371,6 @@
                 return (
                     <div className="app-container fade-in">
                         <div className="card p-8 text-center border-t-8 flex flex-col justify-center items-center" style={{borderColor: 'var(--aavance-blue)'}}>
-                            {/* LOGO AAVANCE AQUÍ */}
                             <BrandLogo />
                             <div className="flex justify-center mb-6 text-green-500">
                                 <Icons.Target />
