@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Diagnóstico Emprendedor Teusaquillo</title>
+    <title>Diagnóstico AAvance Teusaquillo</title>
     
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -11,6 +11,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
+        :root {
+            --aavance-blue: #002244; /* Azul oscuro corporativo AAvance */
+            --aavance-light-blue: #0056b3; 
+            --aavance-accent: #00b4d8;
+        }
+        
         body { 
             font-family: 'Inter', -apple-system, sans-serif; 
             background-color: #f8fafc; 
@@ -35,6 +41,21 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
+        const BrandLogo = () => (
+            <div className="flex flex-col items-center justify-center mb-6">
+                <img 
+                    src="https://aavance.com/wp-content/uploads/2023/10/Logo-AAvance-Color.png" 
+                    alt="AAvance Logo" 
+                    className="h-16 object-contain mb-2"
+                    onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'block';
+                    }}
+                />
+                <h2 style={{display: 'none', color: 'var(--aavance-blue)'}} className="text-3xl font-black tracking-tight">AAvance</h2>
+            </div>
+        );
+
         const Icons = {
             User: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
             BookOpen: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
@@ -58,7 +79,7 @@
             Mountain: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>,
             ArrowLeft: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>,
             ChevronRight: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>,
-            Loader: () => <svg className="animate-spin text-blue-600" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>,
+            Loader: () => <svg className="animate-spin" style={{color: 'var(--aavance-blue)'}} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>,
             Lock: () => <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         };
 
@@ -128,10 +149,10 @@
             ]}
         ];
 
-        // LA LISTA DE CÉDULAS PERMITIDAS DE TEUSAQUILLO (Reemplaza estos números por las cédulas reales)
+        // CÉDULAS DE PRUEBA (Cambia esto por tus cédulas reales luego)
         const CEDULAS_TEUSAQUILLO = ["123456", "987654", "112233", "000000"]; 
         
-        // LA URL DE TU GOOGLE SHEETS VIA SHEETDB
+        // TU URL DE SHEETDB
         const SHEETDB_URL = 'https://sheetdb.io/api/v1/8a4sbxjkocsmg'; 
 
         function App() {
@@ -142,7 +163,7 @@
             const [currentStep, setCurrentStep] = useState(0);
             const [answers, setAnswers] = useState({});
             const [currentText, setCurrentText] = useState('');
-            const [score, setScore] = useState(0); // Puntaje para las preguntas diagnóstico
+            const [score, setScore] = useState(0); 
             const [assignedLevel, setAssignedLevel] = useState('');
 
             const currentQuestion = QUESTIONS[currentStep];
@@ -172,7 +193,6 @@
 
             const handleChoice = (optionObj) => {
                 const newAnswers = { ...answers, [currentQuestion.id]: optionObj.label };
-                // Solo suma puntaje si la opción tiene un 'weight' definido (es una pregunta diagnóstica)
                 const newScore = optionObj.weight ? score + optionObj.weight : score;
                 
                 setAnswers(newAnswers);
@@ -202,7 +222,6 @@
             const calculateAndSubmit = async (finalAnswers, finalScore) => {
                 setAppState('loading');
                 
-                // Determinar el nivel según el puntaje (7 preguntas diagnósticas = Max 21 puntos)
                 let level = "Nivel 1: Iniciación Digital";
                 if (finalScore >= 12 && finalScore <= 16) level = "Nivel 2: Finanzas Personales";
                 if (finalScore >= 17) level = "Nivel 3: Fundamentos de Emprendimiento";
@@ -234,7 +253,6 @@
 
                 } catch (error) {
                     console.error('Error enviando a SheetDB:', error);
-                    // Incluso si falla la red, mostramos el resultado para no bloquear al usuario
                     setTimeout(() => {
                         setAppState('result');
                     }, 1000);
@@ -246,7 +264,9 @@
                 return (
                     <div className="app-container">
                         <div className="card p-8 text-center slide-in flex flex-col justify-center items-center">
-                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-600">
+                            {/* LOGO AAVANCE AQUÍ */}
+                            <BrandLogo />
+                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6" style={{color: 'var(--aavance-blue)'}}>
                                 <Icons.Lock />
                             </div>
                             <h1 className="text-2xl font-extrabold text-slate-800 mb-2">Acceso Exclusivo</h1>
@@ -259,7 +279,8 @@
                                 value={cedulaInput}
                                 onChange={(e) => setCedulaInput(e.target.value)}
                                 placeholder="Tu número de documento"
-                                className="w-full p-4 rounded-xl border-2 border-slate-200 bg-slate-50 focus:border-blue-600 outline-none text-center text-xl font-medium mb-4"
+                                className="w-full p-4 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white outline-none text-center text-xl font-medium mb-4 transition-all"
+                                style={{outlineColor: 'var(--aavance-blue)'}}
                                 onKeyPress={(e) => { if(e.key === 'Enter') handleLogin(); }}
                             />
                             
@@ -267,7 +288,8 @@
                             
                             <button 
                                 onClick={handleLogin}
-                                className="w-full py-4 px-6 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-200"
+                                className="w-full py-4 px-6 text-white rounded-xl font-bold text-lg active:scale-95 transition-all shadow-lg"
+                                style={{backgroundColor: 'var(--aavance-blue)'}}
                             >
                                 Verificar Ingreso
                             </button>
@@ -281,7 +303,9 @@
                 return (
                     <div className="app-container">
                         <div className="card p-8 text-center slide-in flex flex-col justify-center items-center">
-                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-600 bounce">
+                            {/* LOGO AAVANCE AQUÍ */}
+                            <BrandLogo />
+                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 bounce" style={{color: 'var(--aavance-blue)'}}>
                                 <Icons.Rocket />
                             </div>
                             <h1 className="text-3xl font-extrabold text-slate-800 mb-4 leading-tight">Programa de Capital para Emprendedores</h1>
@@ -293,7 +317,8 @@
                             </p>
                             <button 
                                 onClick={() => setAppState('quiz')}
-                                className="w-full py-4 px-6 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 active:scale-95 transition-all shadow-xl shadow-blue-200"
+                                className="w-full py-4 px-6 text-white rounded-2xl font-bold text-lg active:scale-95 transition-all shadow-xl"
+                                style={{backgroundColor: 'var(--aavance-blue)'}}
                             >
                                 ¡Acepto el reto!
                             </button>
@@ -307,6 +332,8 @@
                 return (
                     <div className="app-container fade-in">
                         <div className="text-center flex flex-col items-center">
+                            {/* LOGO AAVANCE AQUÍ */}
+                            <BrandLogo />
                             <Icons.Loader />
                             <h2 className="text-2xl font-bold text-slate-800 mt-6 mb-2">Analizando tu perfil...</h2>
                             <p className="text-slate-500 text-lg">Diseñando tu ruta de aprendizaje ideal.</p>
@@ -319,7 +346,9 @@
             if (appState === 'result') {
                 return (
                     <div className="app-container fade-in">
-                        <div className="card p-8 text-center border-t-8 border-blue-500 flex flex-col justify-center items-center">
+                        <div className="card p-8 text-center border-t-8 flex flex-col justify-center items-center" style={{borderColor: 'var(--aavance-blue)'}}>
+                            {/* LOGO AAVANCE AQUÍ */}
+                            <BrandLogo />
                             <div className="flex justify-center mb-6 text-green-500">
                                 <Icons.Target />
                             </div>
@@ -329,7 +358,8 @@
                             </p>
                             <button 
                                 onClick={() => window.location.reload()}
-                                className="w-full py-4 px-6 bg-slate-800 text-white rounded-2xl font-bold text-lg hover:bg-slate-900 active:scale-95 transition-all"
+                                className="w-full py-4 px-6 text-white rounded-2xl font-bold text-lg active:scale-95 transition-all"
+                                style={{backgroundColor: 'var(--aavance-blue)'}}
                             >
                                 Finalizar
                             </button>
@@ -357,13 +387,17 @@
                                 <div className="w-10"></div>
                             </div>
                             <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
+                                <div className="h-full transition-all duration-500 ease-out" style={{ width: `${progress}%`, backgroundColor: 'var(--aavance-blue)' }} />
                             </div>
                         </div>
 
                         {/* Contenido Pregunta */}
                         <div className="flex-1 px-6 pb-8 flex flex-col overflow-y-auto">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600 flex-shrink-0">
+                            {/* Mini LOGO AAVANCE AQUÍ */}
+                            <div className="flex justify-center mb-4 scale-75 opacity-80">
+                                <BrandLogo />
+                            </div>
+                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 flex-shrink-0" style={{color: 'var(--aavance-blue)'}}>
                                 <IconComponent />
                             </div>
 
@@ -381,13 +415,18 @@
                                                 key={idx}
                                                 onClick={() => handleChoice(optionObj)}
                                                 className={`flex items-center p-5 rounded-2xl border-2 text-left transition-all duration-200 active:scale-[0.98]
-                                                ${isSelected ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-slate-100 hover:border-blue-200 bg-white shadow-sm'}`}
+                                                ${isSelected ? 'shadow-md' : 'border-slate-100 hover:border-blue-200 bg-white shadow-sm'}`}
+                                                style={isSelected ? {borderColor: 'var(--aavance-blue)', backgroundColor: '#f0f8ff'} : {}}
                                             >
                                                 <div className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center transition-colors flex-shrink-0
-                                                    ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-slate-300'}`}>
+                                                    ${isSelected ? '' : 'border-slate-300'}`}
+                                                    style={isSelected ? {borderColor: 'var(--aavance-blue)', backgroundColor: 'var(--aavance-blue)'} : {}}
+                                                >
                                                     {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
                                                 </div>
-                                                <span className={`font-semibold text-[17px] leading-tight ${isSelected ? 'text-blue-900' : 'text-slate-700'}`}>
+                                                <span className={`font-semibold text-[17px] leading-tight ${isSelected ? '' : 'text-slate-700'}`}
+                                                      style={isSelected ? {color: 'var(--aavance-blue)'} : {}}
+                                                >
                                                     {optionObj.label}
                                                 </span>
                                             </button>
@@ -404,13 +443,15 @@
                                         value={currentText}
                                         onChange={(e) => setCurrentText(e.target.value)}
                                         placeholder={currentQuestion.placeholder || "Escribe tu respuesta aquí..."}
-                                        className="w-full p-5 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:border-blue-500 focus:bg-white transition-all text-xl text-slate-800 font-medium outline-none mb-6 shadow-sm"
+                                        className="w-full p-5 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white transition-all text-xl text-slate-800 font-medium outline-none mb-6 shadow-sm"
+                                        style={{outlineColor: 'var(--aavance-blue)'}}
                                         onKeyPress={(e) => { if(e.key === 'Enter') handleNext(); }}
                                     />
                                     <button
                                         onClick={handleNext}
                                         disabled={!currentText.trim()}
-                                        className="w-full py-4 px-6 bg-blue-600 text-white rounded-2xl font-bold text-lg disabled:opacity-40 disabled:scale-100 hover:bg-blue-700 active:scale-95 transition-all shadow-xl shadow-blue-200 flex justify-center items-center"
+                                        className="w-full py-4 px-6 text-white rounded-2xl font-bold text-lg disabled:opacity-40 disabled:scale-100 active:scale-95 transition-all shadow-xl flex justify-center items-center"
+                                        style={{backgroundColor: 'var(--aavance-blue)'}}
                                     >
                                         Continuar
                                         <div className="ml-2"><Icons.ChevronRight /></div>
