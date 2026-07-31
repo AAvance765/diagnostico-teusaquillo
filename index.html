@@ -49,8 +49,9 @@
 
         const BrandLogo = () => (
             <div className="flex flex-col items-center justify-center mb-6">
+                {/* Logo updated to use local file uploaded to GitHub */}
                 <img 
-                    src="https://aavance.com/wp-content/uploads/2023/10/Logo-AAvance-Color.png" 
+                    src="./logo.png" 
                     alt="AAvance Logo" 
                     className="h-16 object-contain mb-2"
                     onError={(e) => {
@@ -108,7 +109,10 @@
             // Módulo 3: El Negocio y Ahorro
             { id: "q_tiempo_negocio", text: "¿Hace cuántos meses le diste vida a tu negocio?", type: "number", icon: "Clock" },
             { id: "q_capital_inicial", text: "¿Recuerdas con cuánto dinero empezaste tu negocio?", type: "number", icon: "Wallet", placeholder: "$" },
-            { id: "q_ahorro_actual", text: "Para este programa el ahorro es clave. ¿Actualmente logras guardar algo de dinero al mes?", type: "select", icon: "PiggyBank", options: [{label:"Sí, sagradamente"}, {label:"A veces"}, {label:"No, por ahora me cuesta"}] },
+            
+            // DIAGNOSTICO: AHORRO (AJUSTADO PESOS)
+            { id: "q_ahorro_actual", text: "Para este programa el ahorro es clave. ¿Actualmente logras guardar algo de dinero al mes?", type: "select", icon: "PiggyBank", options: [{label:"Sí, sagradamente", weight: 3}, {label:"A veces", weight: 2}, {label:"No, por ahora me cuesta", weight: 1}] },
+            
             { id: "q_compromiso_ahorro", text: "¿Cuánto dinero te comprometerías a ahorrar mensualmente durante los próximos 3 meses?", type: "number", icon: "Target", placeholder: "$" },
             
             // PREGUNTAS DIAGNÓSTICAS (Tienen 'weight' para calcular el Nivel)
@@ -155,7 +159,7 @@
             ]}
         ];
 
-        // CÉDULAS PERMITIDAS DE TEUSAQUILLO (Reemplazar)
+        // CÉDULAS PERMITIDAS DE TEUSAQUILLO
         const CEDULAS_TEUSAQUILLO = ["123456", "987654", "112233", "000000"]; 
         
         // URL DE SHEETDB
@@ -185,7 +189,7 @@
                 }
                 
                 if (!aceptarDatos) {
-                    setLoginError("Debes aceptar la política de tratamiento de datos para continuar.");
+                    setLoginError("Debes aceptar la política y autorización de tratamiento de datos para continuar.");
                     return;
                 }
                 
@@ -297,7 +301,7 @@
                                 onKeyPress={(e) => { if(e.key === 'Enter') handleLogin(); }}
                             />
                             
-                            {/* Checkbox de Tratamiento de Datos */}
+                            {/* Checkbox de Tratamiento de Datos (Actualizado) */}
                             <div className="checkbox-wrapper">
                                 <input 
                                     type="checkbox" 
@@ -306,7 +310,7 @@
                                     onChange={(e) => setAceptarDatos(e.target.checked)}
                                 />
                                 <label htmlFor="datosCheck">
-                                    He leído y autorizo la <a href="https://aavance.com/politica-de-tratamiento-de-datos-personales-aavance/" target="_blank" rel="noopener noreferrer">política de tratamiento de datos personales</a> de AAvance SAS para el procesamiento de mi información.
+                                    He leído y acepto la <a href="https://aavance.com/policy/privacy-policy" target="_blank" rel="noopener noreferrer">Política de Tratamiento de datos</a> y la <a href="https://aavance.com/policy/terms-of-service" target="_blank" rel="noopener noreferrer">Autorización de Tratamiento de datos personales</a> de AAvance SAS.
                                 </label>
                             </div>
                             
@@ -333,9 +337,9 @@
                             <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 bounce" style={{color: 'var(--aavance-blue)'}}>
                                 <Icons.Rocket />
                             </div>
-                            <h1 className="text-3xl font-extrabold text-slate-800 mb-4 leading-tight">Programa de Capital para Emprendedores</h1>
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-4 leading-tight">Programa TQ TUYO y MIO</h1>
                             <p className="text-slate-600 mb-6 text-lg leading-relaxed">
-                                Este programa te otorga capital que <strong>no tienes que devolver</strong>. El único requisito es demostrar que puedes ahorrar durante 3 meses consecutivos.
+                                Capital para tu negocio a cambio de tu compromiso de ahorro. Completa este breve cuestionario para trazar tu plan de crecimiento.
                             </p>
                             <p className="text-slate-600 mb-8 text-md leading-relaxed bg-slate-50 p-4 rounded-xl">
                                 A continuación, completaremos tu perfil emprendedor para personalizar tu ruta de aprendizaje. ¡Sé lo más honesto posible!
@@ -345,7 +349,7 @@
                                 className="w-full py-4 px-6 text-white rounded-2xl font-bold text-lg active:scale-95 transition-all shadow-xl"
                                 style={{backgroundColor: 'var(--aavance-blue)'}}
                             >
-                                ¡Acepto el reto!
+                                ¡Quiero participar!
                             </button>
                         </div>
                     </div>
